@@ -1,0 +1,85 @@
+%sdt_libc:setjmp=setjmp
+p:sdt_libc/setjmp /usr/lib/x86_64-linux-gnu/libc-2.31.so:0x45d75 arg1=%di:u64 arg2=%si:s32 arg3=%ax:u64
+%sdt_libc:longjmp=longjmp
+p:sdt_libc/longjmp /usr/lib/x86_64-linux-gnu/libc-2.31.so:0x132a51 arg1=%di:u64 arg2=%si:s32 arg3=%dx:u64
+p:sdt_libc/longjmp /usr/lib/x86_64-linux-gnu/libc-2.31.so:0x45f21 arg1=%di:u64 arg2=%si:s32 arg3=%dx:u64
+p:sdt_libc/longjmp /usr/lib/x86_64-linux-gnu/libc-2.31.so:0x45fb7 arg1=%di:u64 arg2=%si:s32 arg3=%dx:u64
+%sdt_libc:longjmp_target=longjmp_target
+p:sdt_libc/longjmp_target /usr/lib/x86_64-linux-gnu/libc-2.31.so:0x132a6d arg1=%di:u64 arg2=%ax:s32 arg3=%dx:u64
+p:sdt_libc/longjmp_target /usr/lib/x86_64-linux-gnu/libc-2.31.so:0x45f3d arg1=%di:u64 arg2=%ax:s32 arg3=%dx:u64
+p:sdt_libc/longjmp_target /usr/lib/x86_64-linux-gnu/libc-2.31.so:0x45fd3 arg1=%di:u64 arg2=%ax:s32 arg3=%dx:u64
+%sdt_libc:lll_lock_wait_private=lll_lock_wait_private
+p:sdt_libc/lll_lock_wait_private /usr/lib/x86_64-linux-gnu/libc-2.31.so:0x97736 arg1=%di:u64
+%sdt_libc:memory_mallopt_arena_max=memory_mallopt_arena_max
+p:sdt_libc/memory_mallopt_arena_max /usr/lib/x86_64-linux-gnu/libc-2.31.so:0x97fa7 arg1=%ax:u64
+p:sdt_libc/memory_mallopt_arena_max /usr/lib/x86_64-linux-gnu/libc-2.31.so:0x9f916 arg1=%bx:u64
+%sdt_libc:memory_mallopt_arena_test=memory_mallopt_arena_test
+p:sdt_libc/memory_mallopt_arena_test /usr/lib/x86_64-linux-gnu/libc-2.31.so:0x97fb7 arg1=%ax:u64
+p:sdt_libc/memory_mallopt_arena_test /usr/lib/x86_64-linux-gnu/libc-2.31.so:0x9f8de arg1=%bx:u64
+%sdt_libc:memory_tunable_tcache_max_bytes=memory_tunable_tcache_max_bytes
+p:sdt_libc/memory_tunable_tcache_max_bytes /usr/lib/x86_64-linux-gnu/libc-2.31.so:0x97fd0 arg1=%ax:u64
+%sdt_libc:memory_tunable_tcache_count=memory_tunable_tcache_count
+p:sdt_libc/memory_tunable_tcache_count /usr/lib/x86_64-linux-gnu/libc-2.31.so:0x98010 arg1=%ax:u64
+%sdt_libc:memory_tunable_tcache_unsorted_limit=memory_tunable_tcache_unsorted_limit
+p:sdt_libc/memory_tunable_tcache_unsorted_limit /usr/lib/x86_64-linux-gnu/libc-2.31.so:0x98027 arg1=%ax:u64
+%sdt_libc:memory_mallopt_trim_threshold=memory_mallopt_trim_threshold
+p:sdt_libc/memory_mallopt_trim_threshold /usr/lib/x86_64-linux-gnu/libc-2.31.so:0x98337 arg1=%ax:u64
+p:sdt_libc/memory_mallopt_trim_threshold /usr/lib/x86_64-linux-gnu/libc-2.31.so:0x9f8b0 arg1=%bx:u64
+%sdt_libc:memory_mallopt_top_pad=memory_mallopt_top_pad
+p:sdt_libc/memory_mallopt_top_pad /usr/lib/x86_64-linux-gnu/libc-2.31.so:0x98357 arg1=%ax:u64
+p:sdt_libc/memory_mallopt_top_pad /usr/lib/x86_64-linux-gnu/libc-2.31.so:0x9f890 arg1=%bx:u64
+%sdt_libc:memory_mallopt_mmap_threshold=memory_mallopt_mmap_threshold
+p:sdt_libc/memory_mallopt_mmap_threshold /usr/lib/x86_64-linux-gnu/libc-2.31.so:0x98380 arg1=%ax:u64
+p:sdt_libc/memory_mallopt_mmap_threshold /usr/lib/x86_64-linux-gnu/libc-2.31.so:0x9f86c arg1=%bx:u64
+%sdt_libc:memory_mallopt_mmap_max=memory_mallopt_mmap_max
+p:sdt_libc/memory_mallopt_mmap_max /usr/lib/x86_64-linux-gnu/libc-2.31.so:0x983a7 arg1=%ax:s32
+p:sdt_libc/memory_mallopt_mmap_max /usr/lib/x86_64-linux-gnu/libc-2.31.so:0x9f840 arg1=%bx:s32
+%sdt_libc:memory_mallopt_perturb=memory_mallopt_perturb
+p:sdt_libc/memory_mallopt_perturb /usr/lib/x86_64-linux-gnu/libc-2.31.so:0x983c7 arg1=%ax:s32
+p:sdt_libc/memory_mallopt_perturb /usr/lib/x86_64-linux-gnu/libc-2.31.so:0x9f8f0 arg1=%bx:s32
+%sdt_libc:memory_mallopt_mxfast=memory_mallopt_mxfast
+p:sdt_libc/memory_mallopt_mxfast /usr/lib/x86_64-linux-gnu/libc-2.31.so:0x983e0 arg1=%ax:u64
+p:sdt_libc/memory_mallopt_mxfast /usr/lib/x86_64-linux-gnu/libc-2.31.so:0x9f988 arg1=%bx:u64
+%sdt_libc:memory_heap_new=memory_heap_new
+p:sdt_libc/memory_heap_new /usr/lib/x86_64-linux-gnu/libc-2.31.so:0x98591 arg1=%r12:u64 arg2=%bx:u64
+%sdt_libc:memory_arena_reuse_free_list=memory_arena_reuse_free_list
+p:sdt_libc/memory_arena_reuse_free_list /usr/lib/x86_64-linux-gnu/libc-2.31.so:0x98937 arg1=%r12:u64
+%sdt_libc:memory_arena_reuse=memory_arena_reuse
+p:sdt_libc/memory_arena_reuse /usr/lib/x86_64-linux-gnu/libc-2.31.so:0x98dac arg1=%r12:u64 arg2=%bx:u64
+%sdt_libc:memory_arena_reuse_wait=memory_arena_reuse_wait
+p:sdt_libc/memory_arena_reuse_wait /usr/lib/x86_64-linux-gnu/libc-2.31.so:0x98e0d arg1=%dx:u64 arg2=%dx:u64 arg3=%bx:u64
+%sdt_libc:memory_arena_new=memory_arena_new
+p:sdt_libc/memory_arena_new /usr/lib/x86_64-linux-gnu/libc-2.31.so:0x98fec arg1=%r12:u64 arg2=%bp:u64
+%sdt_libc:memory_arena_retry=memory_arena_retry
+p:sdt_libc/memory_arena_retry /usr/lib/x86_64-linux-gnu/libc-2.31.so:0x99205 arg1=%si:u64 arg2=%di:u64
+%sdt_libc:memory_sbrk_less=memory_sbrk_less
+p:sdt_libc/memory_sbrk_less /usr/lib/x86_64-linux-gnu/libc-2.31.so:0x9997f arg1=%ax:u64 arg2=%r12:s64
+%sdt_libc:memory_heap_free=memory_heap_free
+p:sdt_libc/memory_heap_free /usr/lib/x86_64-linux-gnu/libc-2.31.so:0x99ea1 arg1=%di:u64 arg2=%ax:u64
+%sdt_libc:memory_heap_less=memory_heap_less
+p:sdt_libc/memory_heap_less /usr/lib/x86_64-linux-gnu/libc-2.31.so:0x9a09a arg1=%r14:u64 arg2=%r13:u64
+%sdt_libc:memory_tcache_double_free=memory_tcache_double_free
+p:sdt_libc/memory_tcache_double_free /usr/lib/x86_64-linux-gnu/libc-2.31.so:0x9a0b8 arg1=%si:u64 arg2=%ax:u64
+%sdt_libc:memory_heap_more=memory_heap_more
+p:sdt_libc/memory_heap_more /usr/lib/x86_64-linux-gnu/libc-2.31.so:0x9a47e arg1=%r8:u64 arg2=%cx:u64
+%sdt_libc:memory_sbrk_more=memory_sbrk_more
+p:sdt_libc/memory_sbrk_more /usr/lib/x86_64-linux-gnu/libc-2.31.so:0x9a6f8 arg1=%ax:u64 arg2=%r13:s64
+%sdt_libc:memory_malloc_retry=memory_malloc_retry
+p:sdt_libc/memory_malloc_retry /usr/lib/x86_64-linux-gnu/libc-2.31.so:0x9cf50 arg1=%bp:u64
+p:sdt_libc/memory_malloc_retry /usr/lib/x86_64-linux-gnu/libc-2.31.so:0x9d4f0 arg1=%bp:u64
+%sdt_libc:memory_memalign_retry=memory_memalign_retry
+p:sdt_libc/memory_memalign_retry /usr/lib/x86_64-linux-gnu/libc-2.31.so:0x9d7d0 arg1=%r13:u64 arg2=%r12:u64
+p:sdt_libc/memory_memalign_retry /usr/lib/x86_64-linux-gnu/libc-2.31.so:0x9e610 arg1=%r12:u64 arg2=%bp:u64
+p:sdt_libc/memory_memalign_retry /usr/lib/x86_64-linux-gnu/libc-2.31.so:0x9e8f0 arg1=%r12:u64 arg2=%bp:u64
+p:sdt_libc/memory_memalign_retry /usr/lib/x86_64-linux-gnu/libc-2.31.so:0x9ebd0 arg1=%bx:u64 arg2=%bp:u64
+p:sdt_libc/memory_memalign_retry /usr/lib/x86_64-linux-gnu/libc-2.31.so:0x9fc0f arg1=%r12:u64 arg2=%bp:u64
+%sdt_libc:memory_mallopt_free_dyn_thresholds=memory_mallopt_free_dyn_thresholds
+p:sdt_libc/memory_mallopt_free_dyn_thresholds /usr/lib/x86_64-linux-gnu/libc-2.31.so:0x9d920 arg1=%ax:u64 arg2=%dx:u64
+p:sdt_libc/memory_mallopt_free_dyn_thresholds /usr/lib/x86_64-linux-gnu/libc-2.31.so:0x9db00 arg1=%ax:u64 arg2=%dx:u64
+%sdt_libc:memory_realloc_retry=memory_realloc_retry
+p:sdt_libc/memory_realloc_retry /usr/lib/x86_64-linux-gnu/libc-2.31.so:0x9df70 arg1=%r12:u64 arg2=%bp:u64
+p:sdt_libc/memory_realloc_retry /usr/lib/x86_64-linux-gnu/libc-2.31.so:0x9e340 arg1=%r12:u64 arg2=%bp:u64
+%sdt_libc:memory_calloc_retry=memory_calloc_retry
+p:sdt_libc/memory_calloc_retry /usr/lib/x86_64-linux-gnu/libc-2.31.so:0x9ee9e arg1=%r12:u64
+%sdt_libc:memory_mallopt=memory_mallopt
+p:sdt_libc/memory_mallopt /usr/lib/x86_64-linux-gnu/libc-2.31.so:0x9f7c5 arg1=%bp:s32 arg2=%bx:s32

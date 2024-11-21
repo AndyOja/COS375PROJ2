@@ -1,0 +1,20 @@
+# Chunk size 16 bytes 
+# FINI TID 0
+                         error             0
+                          load          9760
+                         store          2230
+                    load+store          1560
+                          code          4879
+                     load+code             0
+                    store+code             0
+               load+store+code             0
+# FINI GLOBAL SUMMARY
+                         error             0
+                          load          9760
+                         store          2230
+                    load+store          1560
+                          code          4879
+                     load+code             0
+                    store+code             0
+               load+store+code             0
+# EOF

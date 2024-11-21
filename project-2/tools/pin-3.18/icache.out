@@ -1,0 +1,9 @@
+PIN:MEMLATENCIES 1.0. 0x0
+#
+# ICACHE stats
+#
+# L1 Inst Cache:
+# Total-Hits:              415832   99.27%
+# Total-Misses:              3060    0.73%
+# Total-Accesses:          418892  100.00%
+
