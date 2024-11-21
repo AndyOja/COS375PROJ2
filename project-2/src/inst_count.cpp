@@ -15,6 +15,7 @@
 
 #include "pin.H"
 #include <iostream>
+#include <unordered_map>
 #include <string.h>
 using std::cerr;
 using std::endl;
@@ -25,6 +26,12 @@ using std::string;
 /* ===================================================================== */
 
 // COS375 TIP: Add global variables here 
+
+// keeps track of routines and the order in which they are seen
+std::vector<std::string> routines; 
+
+// keeps track of the number of instrutions per routine
+std::unordered_map<std::string, int> instructionCount;
 string routineName;
 bool foundMain = false;
 FILE *outFile;
@@ -56,7 +63,7 @@ INT32 Usage()
 VOID docount()
 {
     if (foundMain){
-        //COS375: Add your code here
+        instructionCount[routineName]++;
     }
 }
 
@@ -78,7 +85,12 @@ void executeBeforeRoutine(ADDRINT ip)
     }
 
     //COS375: Add your code here
-        
+
+    // if routine has not been seen, add to order
+    if (instructionCount.find(routineName) == instructionCount.end()){
+        routines.push_back(routineName);
+    }
+
     // Check if exit function is called
     if(routineName.compare("exit") == 0){
         foundMain=false;
@@ -108,6 +120,11 @@ VOID Routine(RTN rtn, VOID *v)
 VOID Fini(INT32 code, VOID *v)
 {
     //COS375: Add your code here to dump instrumentation data that is collected.
+    for (int i = 0; i < routines.size(); ++i){
+        string instruction = routines[i];
+        fprintf(outFile, "%s:%d\n", instruction.c_str(), instructionCount[instruction]);
+    }
+
     fprintf(outFile,"COS375 pin tool Template");
     fclose(outFile);
 }
