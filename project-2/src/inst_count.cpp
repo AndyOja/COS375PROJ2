@@ -120,7 +120,7 @@ VOID Routine(RTN rtn, VOID *v)
 VOID Fini(INT32 code, VOID *v)
 {
     //COS375: Add your code here to dump instrumentation data that is collected.
-    for (int i = 0; i < routines.size(); ++i){
+    for (size_t i = 0; i < routines.size(); ++i){
         string instruction = routines[i];
         fprintf(outFile, "%s:%d\n", instruction.c_str(), instructionCount[instruction]);
     }
