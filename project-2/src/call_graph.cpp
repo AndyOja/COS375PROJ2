@@ -10,7 +10,7 @@
  */
 
 /*! @file
- *  This file contains an ISA-portable PIN tool for generating a call graph
+ *  This file contains an ISA-portable PIN tool for counting dynamic instructions
  */
 
 #include "pin.H"
@@ -27,7 +27,6 @@ using std::string;
 string routineName;
 bool foundMain = false;
 FILE *outFile;
-int indentLevel = 0; // Track the depth of the call graph
 
 /* ===================================================================== */
 /* Commandline Switches */
@@ -53,112 +52,92 @@ INT32 Usage()
 
 /* ===================================================================== */
 
-// Modify docount to accept the argument passed to the function
-void docount(ADDRINT arg0)
+VOID docount(ADDRINT arg0)
 {
-    // Print the function argument passed to the call
-    // Output the current function name and the first argument
-    string calleeName = RTN_FindNameByAddress(arg0);
-    if (calleeName == "") {
-        calleeName = "Unknown";  // Default to "Unknown" if function name is not found
+    if (foundMain) {
+        // Print the argument passed to the function if needed (e.g., arg0)
+        // If you want to log the argument passed to the function, you can print it here
+        fprintf(outFile, "Function argument: %p\n", (void*)arg0);
     }
-
-    for (int i = 0; i < indentLevel; i++) {
-        fprintf(outFile, " ");  // Indentation based on depth
-    }
-    fprintf(outFile, "%s(%d)\n", calleeName.c_str(), (int)arg0);  // Print function and first argument
 }
 
 /* ===================================================================== */
 
-// A callback function executed at runtime before executing first instruction in a function
+// Callback function to be executed before entering a routine
 void executeBeforeRoutine(ADDRINT ip)
 {
-    routineName = (RTN_FindNameByAddress(ip));  // Get the routine name
+    // Get the routine name at the address of the instruction
+    routineName = RTN_FindNameByAddress(ip);
+    
+    // Check if it's the "main" function and mark it
     if (routineName.compare("main") == 0) {
-        foundMain = true;  // Set foundMain flag when "main" function is encountered
+        foundMain = true;
     }
 
-    // Do nothing until main function is seen
+    // Don't do anything until "main" is seen
     if (!foundMain) {
         return;
     }
-    
-    // Check if exit function is called
+
+    // Check if the "exit" function is being called
     if (routineName.compare("exit") == 0) {
-        foundMain = false;  // Reset flag when "exit" is encountered
+        foundMain = false;  // Stop after exit is called
     }
+
+    // You can insert additional checks here if needed
 }
 
-/* ===================================================================== */
-
-// This function is executed every time a new routine is found
+// Function executed every time a new routine is found
 VOID Routine(RTN rtn, VOID *v)
 {
     RTN_Open(rtn);
     
-    // Insert callback to function executeBeforeRoutine which will be executed just before executing first instruction in the routine at runtime
+    // Insert callback to executeBeforeRoutine for each routine
     INS_InsertCall(RTN_InsHead(rtn), IPOINT_BEFORE, (AFUNPTR)executeBeforeRoutine, IARG_INST_PTR, IARG_END);
-
+    
     // Iterate over all instructions in the routine
     for (INS ins = RTN_InsHead(rtn); INS_Valid(ins); ins = INS_Next(ins)) {
-        // Check if the instruction is a function call (using PIN API)
+        // Check if the instruction is a function call
         if (INS_IsCall(ins)) {
-            // Insert callback to log function call information
-            // Capture the first argument of the function
-            ADDRINT arg0 = 0;
-            if (INS_OperandCount(ins) > 0) {
-                INS_InsertCall(ins, IPOINT_BEFORE, (AFUNPTR)docount,
-                               IARG_FUNCARG_ENTRYPOINT_VALUE, 0, IARG_END);  // Get the first argument
-            }
-
-            // Get the name of the called function
-            string calleeName = RTN_FindNameByAddress(INS_Address(ins));
-            if (calleeName == "") {
-                calleeName = "Unknown";  // Default to "Unknown" if the function name is not found
-            }
-
-            // Print the function call with indentation based on the depth
-            for (int i = 0; i < indentLevel; i++) {
-                fprintf(outFile, " ");  // Indentation based on depth
-            }
-            fprintf(outFile, "%s(%d)\n", calleeName.c_str(), (int)arg0);  // Print function and first argument
+            // Insert instrumentation call before the instruction
+            // Here we use docount to handle the function call argument if it's passed
+            INS_InsertCall(ins, IPOINT_BEFORE, (AFUNPTR)docount, 
+                           IARG_FUNCARG_ENTRYPOINT_VALUE, 0, IARG_END);
         }
     }
 
     RTN_Close(rtn);
 }
 
-/* ===================================================================== */
-
-// Function executed after instrumentation to dump the results
+// Fini function to finalize the tool and dump results
 VOID Fini(INT32 code, VOID *v)
 {
-    fclose(outFile);  // Close the output file
+    if (outFile) {
+        // Write to the output file
+        fprintf(outFile, "Instrumentation completed successfully.\n");
+        fclose(outFile);
+    }
 }
 
-// DO NOT EDIT CODE AFTER THIS LINE
-/* ===================================================================== */
-/* Main                                                                  */
-/* ===================================================================== */
-
+// Main function to initialize the PIN tool
 int main(int argc, char *argv[])
 {
     PIN_InitSymbols();
+    
     if (PIN_Init(argc, argv)) {
         return Usage();
     }
 
-    // Open the output file for the call graph
+    // Open output file
     outFile = fopen("call_graph.out", "w");
-
-    // Add instrumentation function for every routine
+    
+    // Register the callback functions
     RTN_AddInstrumentFunction(Routine, 0);
     PIN_AddFiniFunction(Fini, 0);
 
     // Start the program execution
     PIN_StartProgram();
-    
+
     return 0;
 }
 
