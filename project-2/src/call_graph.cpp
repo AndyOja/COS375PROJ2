@@ -92,7 +92,7 @@ VOID Routine(RTN rtn, VOID *v)
         if (INS_IsCall(ins)) {
             // Insert the callback for the current instruction (docount)
             INS_InsertCall(ins, IPOINT_BEFORE, (AFUNPTR)docount,
-            IARG_FUNCARG_ENTRYPOINT_VALUE, 0, IARG_END)
+            IARG_FUNCARG_ENTRYPOINT_VALUE, 0, IARG_END);
 
             // Increment the depth after inserting the callback for the call instruction
             depthLevel++;
