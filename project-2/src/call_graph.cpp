@@ -62,7 +62,7 @@ void docount(ADDRINT arg0)
         
         // Print the first argument (if present)
         if (arg0 != 0) {
-            functionCall += std::to_string((long long) arg0);  // Casting ADDRINT to long long for printing
+            functionCall += std::wstring((long long) arg0);  // Casting ADDRINT to long long for printing
         }
         
         functionCall += ")";
