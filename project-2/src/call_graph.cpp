@@ -103,7 +103,6 @@ VOID Routine(RTN rtn, VOID *v)
     //Iterate over all instructions of routne rtn
     for (INS ins = RTN_InsHead(rtn); INS_Valid(ins); ins = INS_Next(ins)){
         //COS375: Add your code here
-        fprintf(outFile, "here");
         if(INS_IsCall(ins)){
             indentLevel++;
         }
