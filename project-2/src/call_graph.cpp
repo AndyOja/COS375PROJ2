@@ -40,7 +40,7 @@ INT32 Usage()
 /* ===================================================================== */
 
 // Callback function executed at runtime for every instruction
-void docount(ADDRINT arg0)
+VOID docount(ADDRINT arg0)
 {
     // We track the function call information only when depth is greater than 0
     if (depthLevel > 0) {
