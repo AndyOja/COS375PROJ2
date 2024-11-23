@@ -28,6 +28,7 @@ using std::string;
 string routineName;
 bool foundMain = false;
 FILE *outFile;
+int indentLevel = 0;
 
 /* ===================================================================== */
 /* Commandline Switches */
@@ -78,6 +79,9 @@ void executeBeforeRoutine(ADDRINT ip)
     }
 
     //COS375: Add your code here
+    for (int i = 0; i < indentLevel; i++){
+        fprintf(outFile, " ");
+    }
     fprintf(outFile, "%s(,...)\n", routineName.c_str());
 
     // Check if exit function is called
@@ -99,6 +103,12 @@ VOID Routine(RTN rtn, VOID *v)
     //Iterate over all instructions of routne rtn
     for (INS ins = RTN_InsHead(rtn); INS_Valid(ins); ins = INS_Next(ins)){
         //COS375: Add your code here
+        if(INS_IsCall(ins)){
+            indentLevel++;
+        }
+        if(INS_IsRet(ins)){
+            indentLevel--;
+        }
         INS_InsertCall(ins, IPOINT_BEFORE, (AFUNPTR)docount, IARG_END);
     }
     RTN_Close(rtn);
