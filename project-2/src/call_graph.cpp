@@ -12,6 +12,7 @@ using std::vector;
 /* ===================================================================== */
 
 // Global variables to track function calls and their depths
+string routineName;
 int depthLevel = 0; // Tracks the depth of function calls (indentation level)
 vector<string> funcNames; // Stores the names of functions
 vector<int> funcDepths; // Stores the depth of each function call
