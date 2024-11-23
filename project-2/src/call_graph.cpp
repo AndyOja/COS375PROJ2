@@ -52,12 +52,23 @@ INT32 Usage()
 
 /* ===================================================================== */
 
-VOID docount(ADDRINT arg0)
+// Function to handle function calls and print their names and the first argument
+void docount(ADDRINT arg0)
 {
+    // Only track the functions between "main" and "exit"
     if (foundMain) {
-        // Print the argument passed to the function if needed (e.g., arg0)
-        // If you want to log the argument passed to the function, you can print it here
-        fprintf(outFile, "Function argument: %p\n", (void*)arg0);
+        // Start building the function signature to print
+        string functionCall = routineName + "(";
+        
+        // Print the first argument (if present)
+        if (arg0 != 0) {
+            functionCall += std::to_string((long long) arg0);  // Casting ADDRINT to long long for printing
+        }
+        
+        functionCall += ")";
+        
+        // Print the function call to the output file
+        fprintf(outFile, "%s\n", functionCall.c_str());
     }
 }
 
@@ -68,7 +79,7 @@ void executeBeforeRoutine(ADDRINT ip)
 {
     // Get the routine name at the address of the instruction
     routineName = RTN_FindNameByAddress(ip);
-    
+
     // Check if it's the "main" function and mark it
     if (routineName.compare("main") == 0) {
         foundMain = true;
@@ -83,8 +94,6 @@ void executeBeforeRoutine(ADDRINT ip)
     if (routineName.compare("exit") == 0) {
         foundMain = false;  // Stop after exit is called
     }
-
-    // You can insert additional checks here if needed
 }
 
 // Function executed every time a new routine is found
@@ -100,9 +109,10 @@ VOID Routine(RTN rtn, VOID *v)
         // Check if the instruction is a function call
         if (INS_IsCall(ins)) {
             // Insert instrumentation call before the instruction
-            // Here we use docount to handle the function call argument if it's passed
-            INS_InsertCall(ins, IPOINT_BEFORE, (AFUNPTR)docount, 
-                           IARG_FUNCARG_ENTRYPOINT_VALUE, 0, IARG_END);
+            // Here we use docount to handle the first argument passed
+            INS_InsertCall(ins, IPOINT_BEFORE, (AFUNPTR)docount,
+                           IARG_FUNCARG_ENTRYPOINT_VALUE, 0,  // Only pass the first argument (index 0)
+                           IARG_END);
         }
     }
 
@@ -113,7 +123,7 @@ VOID Routine(RTN rtn, VOID *v)
 VOID Fini(INT32 code, VOID *v)
 {
     if (outFile) {
-        // Write to the output file
+        // Write to the output file that the instrumentation completed
         fprintf(outFile, "Instrumentation completed successfully.\n");
         fclose(outFile);
     }
