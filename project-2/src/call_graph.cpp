@@ -37,7 +37,7 @@ INT32 Usage()
 /* ===================================================================== */
 
 // Callback function executed at runtime for every instruction
-VOID docount()
+void docount(ADDRINT arg0)
 {
     // We track the function call information only when depth is greater than 0
     if (depthLevel > 0) {
@@ -45,7 +45,7 @@ VOID docount()
         funcDepths.push_back(depthLevel);
         
         // Assuming the first argument is being captured (IARG_FUNCARG_ENTRYPOINT_VALUE, 0)
-        funcArg.push_back(funcArgVal);
+        funcArg.push_back(arg0);
     }
 }
 
@@ -88,15 +88,14 @@ VOID Routine(RTN rtn, VOID *v)
         // For function call instructions, we increment depth first
         if (INS_IsCall(ins)) {
             // Insert the callback for the current instruction (docount)
-            INS_InsertCall(ins, IPOINT_BEFORE, (AFUNPTR)docount, IARG_END);
+            INS_InsertCall(ins, IPOINT_BEFORE, (AFUNPTR)docount,
+            IARG_FUNCARG_ENTRYPOINT_VALUE, 0, IARG_END)
 
             // Increment the depth after inserting the callback for the call instruction
             depthLevel++;
         }
         // For function return instructions, we decrement depth first
         else if (INS_IsRet(ins)) {
-            // Insert the callback for the current instruction (docount)
-            INS_InsertCall(ins, IPOINT_BEFORE, (AFUNPTR)docount, IARG_END);
 
             // Decrement the depth before executing the return instruction
             depthLevel--;
