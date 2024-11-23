@@ -103,9 +103,6 @@ VOID Routine(RTN rtn, VOID *v)
     //Iterate over all instructions of routne rtn
     for (INS ins = RTN_InsHead(rtn); INS_Valid(ins); ins = INS_Next(ins)){
         //COS375: Add your code here
-        if(INS_IsRet(ins)){
-            indentLevel--;
-        }
         INS_InsertCall(ins, IPOINT_BEFORE, (AFUNPTR)docount, IARG_END);
     }
     RTN_Close(rtn);
