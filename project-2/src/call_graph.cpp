@@ -104,6 +104,7 @@ VOID Routine(RTN rtn, VOID *v)
     for (INS ins = RTN_InsHead(rtn); INS_Valid(ins); ins = INS_Next(ins)){
         //COS375: Add your code here
         if(INS_IsCall(ins)){
+            fprintf(outFile, "here");
             indentLevel++;
         }
         if(INS_IsRet(ins)){
