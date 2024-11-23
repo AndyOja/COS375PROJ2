@@ -78,7 +78,7 @@ void executeBeforeRoutine(ADDRINT ip)
     }
 
     //COS375: Add your code here
-    fprintf(outFile, "%s(,...)\n", routineName);
+    fprintf(outFile, "%s(,...)\n", routineName.c_str());
 
     // Check if exit function is called
     if(routineName.compare("exit") == 0){
