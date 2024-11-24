@@ -60,6 +60,7 @@ VOID docount(ADDRINT arg0)
     if (foundMain){
         //COS375: Add your code here
         currentDepth++;
+        argZero = arg0;
     }
 }
 
@@ -92,8 +93,8 @@ void executeBeforeRoutine(ADDRINT ip)
     for (int i = 0; i < currentDepth; i++){
         fprintf(outFile, " ");
     }
-    fprintf(outFile, "%s(,...)\n", routineName.c_str());
-        
+    fprintf(outFile, "%s(0x%lx,...)\n", routineName.c_str(), arg0);
+
     // Check if exit function is called
     if(routineName.compare("exit") == 0){
         foundMain=false;
