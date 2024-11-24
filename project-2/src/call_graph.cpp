@@ -24,9 +24,12 @@ using std::string;
 /* Global Variables */
 /* ===================================================================== */
 
+// COS375 TIP: Add global variables here 
 string routineName;
 bool foundMain = false;
 FILE *outFile;
+int currentDepth = 0;
+ADDRINT argZero;
 
 /* ===================================================================== */
 /* Commandline Switches */
@@ -52,102 +55,92 @@ INT32 Usage()
 
 /* ===================================================================== */
 
-// Function to handle function calls and print their names and the first argument
-void docount(ADDRINT arg0)
+VOID docount(ADDRINT arg0)
 {
-    // Only track the functions between "main" and "exit"
-    if (foundMain) {
-        // Start building the function signature to print
-        string functionCall = routineName + "(";
-        
-        // Print the first argument (if present)
-        if (arg0 != 0) {
-            functionCall += std::wstring((long long) arg0);  // Casting ADDRINT to long long for printing
-        }
-        
-        functionCall += ")";
-        
-        // Print the function call to the output file
-        fprintf(outFile, "%s\n", functionCall.c_str());
+    if (foundMain){
+        //COS375: Add your code here
+        currentDepth++;
     }
 }
 
 /* ===================================================================== */
-
-// Callback function to be executed before entering a routine
+// A callback function executed at runtime before executing first
+// instruction in a function
 void executeBeforeRoutine(ADDRINT ip)
 {
-    // Get the routine name at the address of the instruction
-    routineName = RTN_FindNameByAddress(ip);
-
-    // Check if it's the "main" function and mark it
-    if (routineName.compare("main") == 0) {
-        foundMain = true;
-    }
-
-    // Don't do anything until "main" is seen
-    if (!foundMain) {
+    // Check if main function is called
+    // If so then set foundMain to true
+    routineName = (RTN_FindNameByAddress(ip));
+    if (routineName.compare("main") == 0){
+        foundMain=true;
+    }    
+    
+    // Do nothing until main function is seen
+    if (!foundMain){
         return;
     }
 
-    // Check if the "exit" function is being called
-    if (routineName.compare("exit") == 0) {
-        foundMain = false;  // Stop after exit is called
+    //COS375: Add your code here
+    fprintf(outFile, "%s(,...)\n", routineName.c_str());
+        
+    // Check if exit function is called
+    if(routineName.compare("exit") == 0){
+        foundMain=false;
     }
 }
 
-// Function executed every time a new routine is found
+/* ===================================================================== */
+// Function executed everytime a new routine is found
 VOID Routine(RTN rtn, VOID *v)
 {
     RTN_Open(rtn);
-    
-    // Insert callback to executeBeforeRoutine for each routine
+    //Insert callback to function executeBeforeRoutine which will be 
+    //executed just before executing first instruction in the routine
+    //at runtime
     INS_InsertCall(RTN_InsHead(rtn), IPOINT_BEFORE, (AFUNPTR)executeBeforeRoutine, IARG_INST_PTR, IARG_END);
-    
-    // Iterate over all instructions in the routine
-    for (INS ins = RTN_InsHead(rtn); INS_Valid(ins); ins = INS_Next(ins)) {
-        // Check if the instruction is a function call
-        if (INS_IsCall(ins)) {
-            // Insert instrumentation call before the instruction
-            // Here we use docount to handle the first argument passed
+
+    //Iterate over all instructions of routne rtn
+    for (INS ins = RTN_InsHead(rtn); INS_Valid(ins); ins = INS_Next(ins)){
+        //COS375: Add your code here
+        if (INS_IsCall(ins)){
             INS_InsertCall(ins, IPOINT_BEFORE, (AFUNPTR)docount,
-                           IARG_FUNCARG_ENTRYPOINT_VALUE, 0,  // Only pass the first argument (index 0)
-                           IARG_END);
+            IARG_FUNCARG_ENTRYPOINT_VALUE, 0, IARG_END)
         }
     }
-
     RTN_Close(rtn);
 }
 
-// Fini function to finalize the tool and dump results
+/* ===================================================================== */
+// Function executed after instrumentation
 VOID Fini(INT32 code, VOID *v)
 {
-    if (outFile) {
-        // Write to the output file that the instrumentation completed
-        fprintf(outFile, "Instrumentation completed successfully.\n");
-        fclose(outFile);
-    }
+    //COS375: Add your code here to dump instrumentation data that is collected.
+    fprintf(outFile,"COS375 pin tool Template");
+    fclose(outFile);
 }
 
-// Main function to initialize the PIN tool
+
+// DO NOT EDIT CODE AFTER THIS LINE
+/* ===================================================================== */
+/* Main                                                                  */
+/* ===================================================================== */
+
 int main(int argc, char *argv[])
 {
     PIN_InitSymbols();
-    
-    if (PIN_Init(argc, argv)) {
+    if( PIN_Init(argc,argv) )
+    {
         return Usage();
     }
-
-    // Open output file
-    outFile = fopen("call_graph.out", "w");
     
-    // Register the callback functions
+
+    outFile = fopen("call_graph.out","w");
     RTN_AddInstrumentFunction(Routine, 0);
     PIN_AddFiniFunction(Fini, 0);
 
-    // Start the program execution
+    // Never returns
     PIN_StartProgram();
-
+    
     return 0;
 }
 
