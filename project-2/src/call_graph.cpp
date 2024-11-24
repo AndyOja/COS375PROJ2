@@ -30,6 +30,8 @@ bool foundMain = false;
 FILE *outFile;
 int currentDepth = 0;
 ADDRINT argZero;
+bool isFunctionEnter = false;
+bool isFunctionExit = false;
 
 /* ===================================================================== */
 /* Commandline Switches */
@@ -42,8 +44,12 @@ ADDRINT argZero;
 
 INT32 Usage()
 {
-    cerr << "This tool is the template for all instrumentations in project-2.\n" << endl;
+    cerr <<
+        "This tool is the template for all instrumentations in project-2.\n"
+        "\n";
+
     cerr << KNOB_BASE::StringKnobSummary();
+
     cerr << endl;
 
     return -1;
@@ -51,82 +57,87 @@ INT32 Usage()
 
 /* ===================================================================== */
 
-// Increment depth when a function is called
 VOID docount(ADDRINT arg0)
 {
-    if (foundMain) {
-        currentDepth++;  // Increment depth on function entry
-        argZero = arg0;   // Store the argument for printing
+    if (foundMain){
+        //COS375: Add your code here
+        if (isFunctionEnter){
+            currentDepth++;
+        }
+        else if (isFunctionExit){
+            currentDepth--;
+        }
+        argZero = arg0;
     }
 }
 
-// A callback function executed at runtime before executing the first instruction in a function
+
+/* ===================================================================== */
+// A callback function executed at runtime before executing first
+// instruction in a function
 void executeBeforeRoutine(ADDRINT ip)
 {
-    // Get the function name by its address
+    // Check if main function is called
+    // If so then set foundMain to true
     routineName = (RTN_FindNameByAddress(ip));
-
-    // If the function is main, set foundMain to true
-    if (routineName.compare("main") == 0) {
-        foundMain = true;
-    }
-
-    // Do nothing until the main function is seen
-    if (!foundMain) {
+    if (routineName.compare("main") == 0){
+        foundMain=true;
+    }    
+    
+    // Do nothing until main function is seen
+    if (!foundMain){
         return;
     }
 
-    // Print spaces corresponding to the current depth
-    for (int i = 0; i < currentDepth; i++) {
+    //COS375: Add your code here
+    for (int i = 0; i < currentDepth; i++){
         fprintf(outFile, " ");
     }
-
-    // Print function name and the argument (in hex)
     fprintf(outFile, "%s(0x%lx,...)\n", routineName.c_str(), argZero);
 
-    // If the exit function is called, stop processing
-    if (routineName.compare("exit") == 0) {
+    // Check if exit function is called
+    if(routineName.compare("exit") == 0){
+        foundMain=false;
+    }
+    if (routineName.compare("exit") == 0){
         currentDepth--;  // Decrement depth when exit is called
-        foundMain = false;  // Prevent further output after exit
+        foundMain = false;  // This will prevent further output after exit
     }
 }
 
 /* ===================================================================== */
-
-// Function executed every time a new routine is found
+// Function executed everytime a new routine is found
 VOID Routine(RTN rtn, VOID *v)
 {
     RTN_Open(rtn);
-
-    // Insert a callback to execute before the first instruction in the routine
+    //Insert callback to function executeBeforeRoutine which will be 
+    //executed just before executing first instruction in the routine
+    //at runtime
     INS_InsertCall(RTN_InsHead(rtn), IPOINT_BEFORE, (AFUNPTR)executeBeforeRoutine, IARG_INST_PTR, IARG_END);
 
-    // Iterate over all instructions in the routine
-    for (INS ins = RTN_InsHead(rtn); INS_Valid(ins); ins = INS_Next(ins)) {
-        // Check if the instruction is a function call
-        if (INS_IsCall(ins)) {
-            INS_InsertCall(ins, IPOINT_BEFORE, (AFUNPTR)docount, IARG_FUNCARG_ENTRYPOINT_VALUE, 0, IARG_END);
-        }
+    //Iterate over all instructions of routne rtn
+    for (INS ins = RTN_InsHead(rtn); INS_Valid(ins); ins = INS_Next(ins)){
+        //COS375: Add your code here
 
-        // Check if the instruction is a function return
-        if (INS_IsRet(ins)) {
-            // Insert a call to docount to decrement depth when returning from the function
-            INS_InsertCall(ins, IPOINT_BEFORE, (AFUNPTR)docount, IARG_FUNCARG_ENTRYPOINT_VALUE, 0, IARG_END);
-            currentDepth--;  // Decrement depth on function return
+        isFunctionEnter = INS_IsCall(ins);
+        isFunctionExit = INS_IsRet(ins);
+        if (isFunctionEnter || isFunctionExit){
+            INS_InsertCall(ins, IPOINT_BEFORE, (AFUNPTR)docount,
+            IARG_FUNCARG_ENTRYPOINT_VALUE, 0, IARG_END);
         }
     }
-
     RTN_Close(rtn);
 }
 
 /* ===================================================================== */
-
-// Function executed after instrumentation is finished
+// Function executed after instrumentation
 VOID Fini(INT32 code, VOID *v)
 {
-    fprintf(outFile, "COS375 pin tool Template\n");
+    //COS375: Add your code here to dump instrumentation data that is collected.
+    fprintf(outFile,"COS375 pin tool Template");
     fclose(outFile);
 }
+
 
 // DO NOT EDIT CODE AFTER THIS LINE
 /* ===================================================================== */
@@ -136,21 +147,19 @@ VOID Fini(INT32 code, VOID *v)
 int main(int argc, char *argv[])
 {
     PIN_InitSymbols();
-
-    if (PIN_Init(argc, argv)) {
+    if( PIN_Init(argc,argv) )
+    {
         return Usage();
     }
+    
 
-    // Open the output file for writing
-    outFile = fopen("call_graph.out", "w");
-
-    // Add instrumentation functions
+    outFile = fopen("call_graph.out","w");
     RTN_AddInstrumentFunction(Routine, 0);
     PIN_AddFiniFunction(Fini, 0);
 
-    // Start the program (this will never return)
+    // Never returns
     PIN_StartProgram();
-
+    
     return 0;
 }
 
