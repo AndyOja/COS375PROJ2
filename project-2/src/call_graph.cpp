@@ -63,6 +63,14 @@ VOID docount(ADDRINT arg0)
     }
 }
 
+VOID decrementDepth(ADDRINT arg0)
+{
+    if (foundMain){
+        // Decrement depth when returning from a function
+        currentDepth--;
+    }
+}
+
 /* ===================================================================== */
 // A callback function executed at runtime before executing first
 // instruction in a function
@@ -90,6 +98,10 @@ void executeBeforeRoutine(ADDRINT ip)
     if(routineName.compare("exit") == 0){
         foundMain=false;
     }
+    if (routineName.compare("exit") == 0){
+        currentDepth--;  // Decrement depth when exit is called
+        foundMain = false;  // This will prevent further output after exit
+    }
 }
 
 /* ===================================================================== */
@@ -108,6 +120,10 @@ VOID Routine(RTN rtn, VOID *v)
         if (INS_IsCall(ins)){
             INS_InsertCall(ins, IPOINT_BEFORE, (AFUNPTR)docount,
             IARG_FUNCARG_ENTRYPOINT_VALUE, 0, IARG_END);
+        }
+        if (INS_IsRet(ins)){
+            INS_InsertCall(ins, IPOINT_BEFORE, (AFUNPTR)decrementDepth,
+                IARG_INST_PTR, IARG_END);
         }
     }
     RTN_Close(rtn);
