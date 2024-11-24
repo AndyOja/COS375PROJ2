@@ -81,6 +81,9 @@ void executeBeforeRoutine(ADDRINT ip)
     }
 
     //COS375: Add your code here
+    for (int i = 0; i < currentDepth; i++){
+        fprintf(outFile, " ");
+    }
     fprintf(outFile, "%s(,...)\n", routineName.c_str());
         
     // Check if exit function is called
