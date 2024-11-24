@@ -93,7 +93,7 @@ void executeBeforeRoutine(ADDRINT ip)
     for (int i = 0; i < currentDepth; i++){
         fprintf(outFile, " ");
     }
-    fprintf(outFile, "%s(0x%lx,...)\n", routineName.c_str(), arg0);
+    fprintf(outFile, "%s(0x%lx,...)\n", routineName.c_str(), argZero);
 
     // Check if exit function is called
     if(routineName.compare("exit") == 0){
