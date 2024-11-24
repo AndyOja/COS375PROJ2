@@ -30,6 +30,8 @@ bool foundMain = false;
 FILE *outFile;
 int currentDepth = 0;
 ADDRINT argZero;
+bool isFunctionEnter = false;
+bool isFunctionExit = false;
 
 /* ===================================================================== */
 /* Commandline Switches */
@@ -59,18 +61,16 @@ VOID docount(ADDRINT arg0)
 {
     if (foundMain){
         //COS375: Add your code here
-        currentDepth++;
+        if (isFunctionEnter){
+            currentDepth++;
+        }
+        else if (isFunctionExit){
+            currentDepth--;
+        }
         argZero = arg0;
     }
 }
 
-VOID decrementDepth(ADDRINT arg0)
-{
-    if (foundMain){
-        // Decrement depth when returning from a function
-        currentDepth--;
-    }
-}
 
 /* ===================================================================== */
 // A callback function executed at runtime before executing first
@@ -118,14 +118,11 @@ VOID Routine(RTN rtn, VOID *v)
     //Iterate over all instructions of routne rtn
     for (INS ins = RTN_InsHead(rtn); INS_Valid(ins); ins = INS_Next(ins)){
         //COS375: Add your code here
-        if (INS_IsCall(ins)){
-            INS_InsertCall(ins, IPOINT_BEFORE, (AFUNPTR)docount,
-            IARG_FUNCARG_ENTRYPOINT_VALUE, 0, IARG_END);
-        }
-        if (INS_IsRet(ins)){
-            INS_InsertCall(ins, IPOINT_BEFORE, (AFUNPTR)decrementDepth,
-                IARG_INST_PTR, IARG_END);
-        }
+
+        isFunctionEnter = INS_IsCall(ins);
+        isFunctionExit = INS_IsRet(ins);
+        INS_InsertCall(ins, IPOINT_BEFORE, (AFUNPTR)docount,
+        IARG_FUNCARG_ENTRYPOINT_VALUE, 0, IARG_END);
     }
     RTN_Close(rtn);
 }
