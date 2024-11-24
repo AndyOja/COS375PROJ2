@@ -58,17 +58,20 @@ INT32 Usage()
 /* ===================================================================== */
 
 // callback function for when a new function call is encountered
-VOID doCount(bool isFunctionEnter, bool isFunctionExit, ADDRINT arg0)
+VOID incrementDepth(ADDRINT arg0)
 {
     if (foundMain){
         //COS375: Add your code here
-        if (isFunctionEnter){
-            currentDepth++;
-        }
-        else if(isFunctionExit){
-            currentDepth--;
-        }
+        currentDepth++;
         argZero = arg0;
+    }
+}
+
+VOID decrementDepth(ADDRINT arg0)
+{
+    if (foundMain){
+        // Decrement depth when returning from a function
+        currentDepth--;
     }
 }
 
@@ -118,9 +121,14 @@ VOID Routine(RTN rtn, VOID *v)
     //Iterate over all instructions of routne rtn
     for (INS ins = RTN_InsHead(rtn); INS_Valid(ins); ins = INS_Next(ins)){
         //COS375: Add your code here
-            INS_InsertCall(ins, IPOINT_BEFORE, (AFUNPTR)doCount, 
-            INS_IsCall(ins), INS_IsRet(ins), IARG_FUNCARG_ENTRYPOINT_VALUE, 
-            0, IARG_END);
+        if (INS_IsCall(ins)){
+            INS_InsertCall(ins, IPOINT_BEFORE, (AFUNPTR)incrementDepth,
+            IARG_FUNCARG_ENTRYPOINT_VALUE, 0, IARG_END);
+        }
+        if (INS_IsRet(ins)){
+            INS_InsertCall(ins, IPOINT_BEFORE, (AFUNPTR)decrementDepth,
+                IARG_INST_PTR, IARG_END);
+        }
     }
     RTN_Close(rtn);
 }
