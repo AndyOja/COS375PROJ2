@@ -115,7 +115,7 @@ VOID Routine(RTN rtn, VOID *v)
         else if (INS_IsMemoryWrite(ins)){
             INS_InsertCall(ins, IPOINT_BEFORE, (AFUNPTR)Store, IARG_MEMORYREAD_EA IARG_END);
         }
-        
+           
     }
     RTN_Close(rtn);
 }
