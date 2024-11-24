@@ -121,8 +121,10 @@ VOID Routine(RTN rtn, VOID *v)
 
         isFunctionEnter = INS_IsCall(ins);
         isFunctionExit = INS_IsRet(ins);
+        if (isFunctionEnter || isFunctionExit){
         INS_InsertCall(ins, IPOINT_BEFORE, (AFUNPTR)docount,
-        IARG_FUNCARG_ENTRYPOINT_VALUE, 0, IARG_END);
+            IARG_FUNCARG_ENTRYPOINT_VALUE, 0, IARG_END);
+        }
     }
     RTN_Close(rtn);
 }
