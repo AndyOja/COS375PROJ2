@@ -107,7 +107,7 @@ VOID Routine(RTN rtn, VOID *v)
         //COS375: Add your code here
         if (INS_IsCall(ins)){
             INS_InsertCall(ins, IPOINT_BEFORE, (AFUNPTR)docount,
-            IARG_FUNCARG_ENTRYPOINT_VALUE, 0, IARG_END)
+            IARG_FUNCARG_ENTRYPOINT_VALUE, 0, IARG_END);
         }
     }
     RTN_Close(rtn);
