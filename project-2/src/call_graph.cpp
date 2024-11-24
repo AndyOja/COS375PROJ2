@@ -118,7 +118,7 @@ VOID Routine(RTN rtn, VOID *v)
     //Iterate over all instructions of routne rtn
     for (INS ins = RTN_InsHead(rtn); INS_Valid(ins); ins = INS_Next(ins)){
         //COS375: Add your code here
-            INS_InsertCall(ins, IPOINT_BEFORE, (AFUNPTR)incrementDepth, 
+            INS_InsertCall(ins, IPOINT_BEFORE, (AFUNPTR)doCount, 
             INS_IsCall(ins), INS_IsRet(ins), IARG_FUNCARG_ENTRYPOINT_VALUE, 
             0, IARG_END);
     }
