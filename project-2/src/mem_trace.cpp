@@ -113,7 +113,7 @@ VOID Routine(RTN rtn, VOID *v)
             INS_InsertCall(ins, IPOINT_BEFORE, (AFUNPTR)Load, IARG_MEMORYREAD_EA, IARG_END);
         }
         else if (INS_IsMemoryWrite(ins)){
-            INS_InsertCall(ins, IPOINT_BEFORE, (AFUNPTR)Store, IARG_MEMORYREAD_EA, IARG_END);
+            INS_InsertCall(ins, IPOINT_BEFORE, (AFUNPTR)Store, IARG_MEMORYWRITE_EA, IARG_END);
         }
            
     }
