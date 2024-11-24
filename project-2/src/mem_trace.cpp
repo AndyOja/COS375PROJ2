@@ -54,20 +54,20 @@ INT32 Usage()
 /* ===================================================================== */
 
 // called everytime that a load instruction is encountered
-VOID Load(ADDRINT mem_value)
+VOID Load(ADDRINT ip, ADDRINT mem_value)
 {
     if (foundMain){
         //COS375: Add your code here
-        fprintf(outFile, "0x%lx L\n", mem_value);
+        fprintf(outFile, "0x%lx 0x%lx L\n", ip, mem_value);
     }
 }
 
 // called everytime a store instruction is encountered
-VOID Store(ADDRINT mem_value)
+VOID Store(ADDRINT ip, ADDRINT mem_value)
 {
     if (foundMain){
         //COS375: Add your code here
-        fprintf(outFile, "0x%lx S\n", mem_value);
+        fprintf(outFile, "0x%lx 0x%lx S\n", ip, mem_value);
     }
 }
 
@@ -110,10 +110,10 @@ VOID Routine(RTN rtn, VOID *v)
     for (INS ins = RTN_InsHead(rtn); INS_Valid(ins); ins = INS_Next(ins)){
         //COS375: Add your code here
         if (INS_IsMemoryRead(ins)){
-            INS_InsertCall(ins, IPOINT_BEFORE, (AFUNPTR)Load, IARG_MEMORYREAD_EA, IARG_END);
+            INS_InsertCall(ins, IPOINT_BEFORE, (AFUNPTR)Load, IARG_INST_PTR, IARG_MEMORYREAD_EA, IARG_END);
         }
         else if (INS_IsMemoryWrite(ins)){
-            INS_InsertCall(ins, IPOINT_BEFORE, (AFUNPTR)Store, IARG_MEMORYWRITE_EA, IARG_END);
+            INS_InsertCall(ins, IPOINT_BEFORE, (AFUNPTR)Store, IARG_INST_PTR, IARG_MEMORYWRITE_EA, IARG_END);
         }
            
     }
