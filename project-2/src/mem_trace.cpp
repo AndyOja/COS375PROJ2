@@ -53,10 +53,21 @@ INT32 Usage()
 
 /* ===================================================================== */
 
-VOID docount()
+// called everytime that a load instruction is encountered
+VOID Load(ADDRINT mem_value)
 {
     if (foundMain){
         //COS375: Add your code here
+        fprintf(outFile, "0x%lx L\n", mem_value);
+    }
+}
+
+// called everytime a store instruction is encountered
+VOID Store(ADDRINT mem_value)
+{
+    if (foundMain){
+        //COS375: Add your code here
+        fprintf(outFile, "0x%lx S\n", mem_value);
     }
 }
 
@@ -98,7 +109,13 @@ VOID Routine(RTN rtn, VOID *v)
     //Iterate over all instructions of routne rtn
     for (INS ins = RTN_InsHead(rtn); INS_Valid(ins); ins = INS_Next(ins)){
         //COS375: Add your code here
-        INS_InsertCall(ins, IPOINT_BEFORE, (AFUNPTR)docount, IARG_END);
+        if (INS_IsMemoryRead(ins)){
+            INS_InsertCall(ins, IPOINT_BEFORE, (AFUNPTR)Load, IARG_MEMORYREAD_EA IARG_END);
+        }
+        else if (INS_IsMemoryWrite(ins)){
+            INS_InsertCall(ins, IPOINT_BEFORE, (AFUNPTR)Store, IARG_MEMORYREAD_EA IARG_END);
+        }
+        
     }
     RTN_Close(rtn);
 }
