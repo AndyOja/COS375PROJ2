@@ -110,10 +110,10 @@ VOID Routine(RTN rtn, VOID *v)
     for (INS ins = RTN_InsHead(rtn); INS_Valid(ins); ins = INS_Next(ins)){
         //COS375: Add your code here
         if (INS_IsMemoryRead(ins)){
-            INS_InsertCall(ins, IPOINT_BEFORE, (AFUNPTR)Load, IARG_MEMORYREAD_EA IARG_END);
+            INS_InsertCall(ins, IPOINT_BEFORE, (AFUNPTR)Load, IARG_MEMORYREAD_EA, IARG_END);
         }
         else if (INS_IsMemoryWrite(ins)){
-            INS_InsertCall(ins, IPOINT_BEFORE, (AFUNPTR)Store, IARG_MEMORYREAD_EA IARG_END);
+            INS_InsertCall(ins, IPOINT_BEFORE, (AFUNPTR)Store, IARG_MEMORYREAD_EA, IARG_END);
         }
            
     }
