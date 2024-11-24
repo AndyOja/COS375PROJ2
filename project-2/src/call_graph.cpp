@@ -59,11 +59,13 @@ VOID docount(ADDRINT arg0)
 {
     if (foundMain){
         //COS375: Add your code here
+        // increments the current depth for printing
         currentDepth++;
         argZero = arg0;
     }
 }
 
+// call-back function if an exit is encountered (decrements current depth)
 VOID decrementDepth(ADDRINT arg0)
 {
     if (foundMain){
