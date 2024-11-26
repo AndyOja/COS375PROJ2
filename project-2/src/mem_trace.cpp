@@ -53,20 +53,20 @@ INT32 Usage()
 
 /* ===================================================================== */
 
-// called everytime that a load instruction is encountered
+// call-back for every load instruction encountered
+// prints (in hex) the instruction address, address of memory being accessed, and L (for load)
 VOID Load(ADDRINT ip, ADDRINT mem_value)
 {
     if (foundMain){
-        //COS375: Add your code here
         fprintf(outFile, "0x%lx 0x%lx L\n", ip, mem_value);
     }
 }
 
-// called everytime a store instruction is encountered
+// call-back for every store instruction encountered
+// prints (in hex) the instruction address, address of memory being accessed, and S for store
 VOID Store(ADDRINT ip, ADDRINT mem_value)
 {
     if (foundMain){
-        //COS375: Add your code here
         fprintf(outFile, "0x%lx 0x%lx S\n", ip, mem_value);
     }
 }
@@ -87,8 +87,6 @@ void executeBeforeRoutine(ADDRINT ip)
     if (!foundMain){
         return;
     }
-
-    //COS375: Add your code here
         
     // Check if exit function is called
     if(routineName.compare("exit") == 0){
@@ -108,10 +106,14 @@ VOID Routine(RTN rtn, VOID *v)
 
     //Iterate over all instructions of routne rtn
     for (INS ins = RTN_InsHead(rtn); INS_Valid(ins); ins = INS_Next(ins)){
-        //COS375: Add your code here
+
+        // inserts call-back to Load function for every memory read/load encountered
+        // passes current instruction address and address of memory being accessed
         if (INS_IsMemoryRead(ins)){
             INS_InsertCall(ins, IPOINT_BEFORE, (AFUNPTR)Load, IARG_INST_PTR, IARG_MEMORYREAD_EA, IARG_END);
         }
+        // inserts call-back to Store function for every memory write/store encountered
+        // passes current instruction address and address of memory being accessed
         else if (INS_IsMemoryWrite(ins)){
             INS_InsertCall(ins, IPOINT_BEFORE, (AFUNPTR)Store, IARG_INST_PTR, IARG_MEMORYWRITE_EA, IARG_END);
         }
@@ -122,9 +124,9 @@ VOID Routine(RTN rtn, VOID *v)
 
 /* ===================================================================== */
 // Function executed after instrumentation
+// All function data printed as it is encountered, so no data printed in Fini
 VOID Fini(INT32 code, VOID *v)
 {
-    //COS375: Add your code here to dump instrumentation data that is collected.
     fprintf(outFile,"COS375 pin tool Template");
     fclose(outFile);
 }
