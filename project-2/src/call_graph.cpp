@@ -29,7 +29,7 @@ string routineName;
 bool foundMain = false;
 FILE *outFile;
 int currentDepth = 0; // tracks the depth/level of the current routine
-ADDRINT argZero; // tracks the 1st argument passed to a routine the current routine
+ADDRINT argZero = 5; // tracks the 1st argument passed to a routine the current routine
 
 /* ===================================================================== */
 /* Commandline Switches */
@@ -61,7 +61,7 @@ VOID incrementDepth(ADDRINT arg0)
 {
     if (foundMain){
         currentDepth++; 
-        argZero = arg0; 
+        argZero = arg0;
     }
 }
 
@@ -148,7 +148,6 @@ VOID Fini(INT32 code, VOID *v)
     fclose(outFile);
 }
 
-
 // DO NOT EDIT CODE AFTER THIS LINE
 /* ===================================================================== */
 /* Main                                                                  */
@@ -161,7 +160,6 @@ int main(int argc, char *argv[])
     {
         return Usage();
     }
-    
 
     outFile = fopen("call_graph.out","w");
     RTN_AddInstrumentFunction(Routine, 0);
