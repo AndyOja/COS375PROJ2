@@ -29,7 +29,7 @@ string routineName;
 bool foundMain = false;
 FILE *outFile;
 int currentDepth = 0; // tracks the depth/level of the current routine
-ADDRINT argZero; // tracks the 1st argument passed to a routine the current routine
+//ADDRINT argZero; // tracks the 1st argument passed to a routine the current routine
 
 /* ===================================================================== */
 /* Commandline Switches */
@@ -77,7 +77,7 @@ VOID decrementDepth(ADDRINT arg0)
 /* ===================================================================== */
 // A callback function executed at runtime before executing first
 // instruction in a function
-void executeBeforeRoutine(ADDRINT ip)
+void executeBeforeRoutine(ADDRINT ip, ADDRINT argZero)
 {
     // Check if main function is called
     // If so then set foundMain to true
@@ -118,8 +118,8 @@ VOID Routine(RTN rtn, VOID *v)
     //Insert callback to function executeBeforeRoutine which will be 
     //executed just before executing first instruction in the routine
     //at runtime
-    argZero = IARG_FUNCARG_ENTRYPOINT_VALUE;
-    INS_InsertCall(RTN_InsHead(rtn), IPOINT_BEFORE, (AFUNPTR)executeBeforeRoutine, IARG_INST_PTR, IARG_END);
+    INS_InsertCall(RTN_InsHead(rtn), IPOINT_BEFORE, (AFUNPTR)executeBeforeRoutine, 
+        IARG_INST_PTR, IARG_FUNCARG_ENTRYPOINT_VALUE, 0, IARG_END);
 
     //Iterate over all instructions of routne rtn
     for (INS ins = RTN_InsHead(rtn); INS_Valid(ins); ins = INS_Next(ins)){
