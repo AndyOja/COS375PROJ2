@@ -27,11 +27,12 @@ using std::string;
 
 // COS375 TIP: Add global variables here 
 
-// keeps track of routines and the order in which they are seen
+// tracks of the order in which routines appear
 std::vector<std::string> routines; 
 
-// keeps track of the number of instrutions per routine
+// tracks the number of instructions for each routine
 std::unordered_map<std::string, int> instructionCount;
+
 string routineName;
 bool foundMain = false;
 FILE *outFile;
@@ -59,7 +60,8 @@ INT32 Usage()
 }
 
 /* ===================================================================== */
-
+// call-back for each instruction, increments the number of instrucions
+// seen for each routine
 VOID docount()
 {
     if (foundMain){
@@ -86,7 +88,7 @@ void executeBeforeRoutine(ADDRINT ip)
 
     //COS375: Add your code here
 
-    // if routine has not been seen, add to order
+    // if routine has not been seen, add to order list
     if (instructionCount.find(routineName) == instructionCount.end()){
         routines.push_back(routineName);
     }
@@ -120,6 +122,8 @@ VOID Routine(RTN rtn, VOID *v)
 VOID Fini(INT32 code, VOID *v)
 {
     //COS375: Add your code here to dump instrumentation data that is collected.
+    // prints out the number of instructions for each routine in the order in which routines
+    // were encountered
     for (size_t i = 0; i < routines.size(); ++i){
         string instruction = routines[i];
         fprintf(outFile, "%s:%d\n", instruction.c_str(), instructionCount[instruction]);
