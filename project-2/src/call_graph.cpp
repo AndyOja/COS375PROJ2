@@ -118,7 +118,7 @@ VOID Routine(RTN rtn, VOID *v)
     //Insert callback to function executeBeforeRoutine which will be 
     //executed just before executing first instruction in the routine
     //at runtime
-    argZero = *IARG_INSTR_PTR;
+    argZero = IARG_FUNCARG_ENTRYPOINT_VALUE;
     INS_InsertCall(RTN_InsHead(rtn), IPOINT_BEFORE, (AFUNPTR)executeBeforeRoutine, IARG_INST_PTR, IARG_END);
 
     //Iterate over all instructions of routne rtn
