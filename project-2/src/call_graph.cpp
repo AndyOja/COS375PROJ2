@@ -28,10 +28,8 @@ using std::string;
 string routineName;
 bool foundMain = false;
 FILE *outFile;
-int currentDepth = 0;
-ADDRINT argZero;
-bool isFunctionEnter = false;
-bool isFunctoinExit = false;
+int currentDepth = 0; // tracks the depth/level of the current routine
+ADDRINT argZero; // tracks the 1st argument passed to a routine the current routine
 
 /* ===================================================================== */
 /* Commandline Switches */
@@ -57,20 +55,21 @@ INT32 Usage()
 
 /* ===================================================================== */
 
-// callback function for when a new function call is encountered
+// callback function for function call instructions
+// sets first argument for printing and increments routine depth/level
 VOID incrementDepth(ADDRINT arg0)
 {
     if (foundMain){
-        //COS375: Add your code here
-        currentDepth++;
-        argZero = arg0;
+        currentDepth++; 
+        argZero = arg0; 
     }
 }
 
+// callback function for function exit instructions
+// decrements routine depth/level
 VOID decrementDepth(ADDRINT arg0)
 {
     if (foundMain){
-        // Decrement depth when returning from a function
         currentDepth--;
     }
 }
@@ -93,6 +92,9 @@ void executeBeforeRoutine(ADDRINT ip)
     }
 
     //COS375: Add your code here
+    
+    // prints the appropriate number of spaces based on depth, prints routine name
+    // and 1st argument in hex
     for (int i = 0; i < currentDepth; i++){
         fprintf(outFile, " ");
     }
@@ -121,10 +123,13 @@ VOID Routine(RTN rtn, VOID *v)
     //Iterate over all instructions of routne rtn
     for (INS ins = RTN_InsHead(rtn); INS_Valid(ins); ins = INS_Next(ins)){
         //COS375: Add your code here
+
+        // inserts callback to incrementDepth for each function call instruction
         if (INS_IsCall(ins)){
             INS_InsertCall(ins, IPOINT_BEFORE, (AFUNPTR)incrementDepth,
             IARG_FUNCARG_ENTRYPOINT_VALUE, 0, IARG_END);
         }
+        // inserts callback to decrementDepth for each exit/return instruction
         if (INS_IsRet(ins)){
             INS_InsertCall(ins, IPOINT_BEFORE, (AFUNPTR)decrementDepth,
                 IARG_INST_PTR, IARG_END);
@@ -135,6 +140,7 @@ VOID Routine(RTN rtn, VOID *v)
 
 /* ===================================================================== */
 // Function executed after instrumentation
+// All function data printed as it is encountered, so no data printed in Fini
 VOID Fini(INT32 code, VOID *v)
 {
     //COS375: Add your code here to dump instrumentation data that is collected.
