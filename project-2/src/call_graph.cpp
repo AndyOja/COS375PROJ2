@@ -29,7 +29,6 @@ string routineName;
 bool foundMain = false;
 FILE *outFile;
 int currentDepth = 0; // tracks the depth/level of the current routine
-//ADDRINT argZero; // tracks the 1st argument passed to a routine the current routine
 
 /* ===================================================================== */
 /* Commandline Switches */
@@ -56,18 +55,17 @@ INT32 Usage()
 /* ===================================================================== */
 
 // callback function for function call instructions
-// sets first argument for printing and increments routine depth/level
-VOID incrementDepth(ADDRINT arg0)
+// increments routine depth/level
+VOID incrementDepth()
 {
     if (foundMain){
         currentDepth++; 
-        //argZero = arg0;
     }
 }
 
 // callback function for function exit instructions
 // decrements routine depth/level
-VOID decrementDepth(ADDRINT arg0)
+VOID decrementDepth()
 {
     if (foundMain){
         currentDepth--;
@@ -104,10 +102,6 @@ void executeBeforeRoutine(ADDRINT ip, ADDRINT argZero)
     if(routineName.compare("exit") == 0){
         foundMain=false;
     }
-    if (routineName.compare("exit") == 0){
-        currentDepth--;  // Decrement depth when exit is called
-        foundMain = false;  // This will prevent further output after exit
-    }
 }
 
 /* ===================================================================== */
@@ -118,6 +112,7 @@ VOID Routine(RTN rtn, VOID *v)
     //Insert callback to function executeBeforeRoutine which will be 
     //executed just before executing first instruction in the routine
     //at runtime
+    // added paramater (IARG_FUNCARG_ENTRYPOINT_VALUE) to call-back to print 1st arg
     INS_InsertCall(RTN_InsHead(rtn), IPOINT_BEFORE, (AFUNPTR)executeBeforeRoutine, 
         IARG_INST_PTR, IARG_FUNCARG_ENTRYPOINT_VALUE, 0, IARG_END);
 
@@ -127,8 +122,7 @@ VOID Routine(RTN rtn, VOID *v)
 
         // inserts callback to incrementDepth for each function call instruction
         if (INS_IsCall(ins)){
-            INS_InsertCall(ins, IPOINT_BEFORE, (AFUNPTR)incrementDepth,
-            IARG_FUNCARG_ENTRYPOINT_VALUE, 0, IARG_END);
+            INS_InsertCall(ins, IPOINT_BEFORE, (AFUNPTR)incrementDepth, IARG_END);
         }
         // inserts callback to decrementDepth for each exit/return instruction
         if (INS_IsRet(ins)){
