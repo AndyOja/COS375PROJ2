@@ -61,7 +61,7 @@ VOID incrementDepth(ADDRINT arg0)
 {
     if (foundMain){
         currentDepth++; 
-        argZero = arg0;
+        //argZero = arg0;
     }
 }
 
