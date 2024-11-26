@@ -27,7 +27,7 @@ using std::string;
 
 // COS375 TIP: Add global variables here 
 
-// tracks of the order in which routines appear
+// tracks the order in which routines appear
 std::vector<std::string> routines; 
 
 // tracks the number of instructions for each routine
